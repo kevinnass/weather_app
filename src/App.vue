@@ -1,9 +1,9 @@
 <template>
   <div id="app"  :class="typeof weather.main != 'undefined' && weather.main.temp > 16 ? 'warm' : ''">
     <main class="">
-      <div class="search-box w-5/6 m-auto flex">
-        <input type="search" placeholder="Search..."
-        class="search-bar mt-10"
+      <div class="search-box w-5/6 text-black m-auto flex">
+        <input type="search" placeholder="Search for a city..."
+        class="search-bar text-black mt-10"
         v-model="query"
         @keypress="fetchWeather"/>
       </div>
@@ -24,6 +24,8 @@
           <div class="weather mt-3">{{ weather.weather[0].main }}</div>
         </div>
       </div>
+      <div v-if="error" class="text-black-600 shadow-2xl w-5/6 m-auto rounded-md h-16 py-4 border-black bg-gray-500 border font-bold text-center mt-56">No Result.</br> Search for an existing city</div>
+      <div v-if="noLocalWeather" class="text-black-600 shadow-lg w-5/6 m-auto rounded-md h-16 py-4 border-black bg-gray-500 border font-bold text-center mt-56">Search for a city </br> to find its weather</div>
     </main>
   </div>
 </template>
@@ -39,6 +41,8 @@ export default {
       query: '',
       load: false,
       code: '',
+      error: false,
+      noLocalWeather: false,
       weather: {}
     }
   },
@@ -68,22 +72,34 @@ export default {
       if (e.key ===  "Enter") {
         this.weather = {};
         this.load = true;
+        this.noLocalWeather = false;
+        this.error = false;
         http.get(this.url_base + 'weather?q=' + this.query + '&units=metric&appid=' + this.api_key)
         .then(response => {
           this.setLoading();
           return response;
         }).then(this.setResults)
+        .catch(error => {
+          this.setLoading();
+          this.error = true;
+        })
       }
     },
     localWeather() {
       let country = this.findCountry(this.code);
       country = country.join('');
-      console.log('country =', country);
+      this.load = true;
+      this.noLocalWeather = false;
+      this.error = false;
       http.get(this.url_base + 'weather?q=' + country + '&units=metric&appid=' + this.api_key)
-          .then(response => {
-            this.setLoading();
-            return response;
-          }).then(this.setResults)
+        .then(response => {
+          this.setLoading();
+          return response;
+        }).then(this.setResults)
+        .catch(error => {
+          this.setLoading();
+          this.noLocalWeather = true;
+        })
     },
     findCountry(country) {
       let newCountry = [];
@@ -95,9 +111,10 @@ export default {
     }
   },
   mounted() {
+    this.load = true;
     setTimeout(func => {
       this.localWeather()
-    }, 2000);
+    }, 3000);
   }
 }
 </script>
