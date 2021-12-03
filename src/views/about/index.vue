@@ -1,8 +1,3 @@
-<!--
-About Page
-Created at 09/04/2021 11:45
-Author: Khaliq ALI
-!-->
 <template>
 <div class="about-page w-full h-screen flex justify-center items-center">
   <div class="flex flex-col justify-center">

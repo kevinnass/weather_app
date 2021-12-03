@@ -1,8 +1,3 @@
-/*
-App
-Created at 09/04/2021 11:44
-Author: Khaliq ALI
- */
 import Vue from 'vue'
 import Vuex from 'vuex'
 // import apiRoutes from './router/api-routes'

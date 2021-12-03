@@ -2,10 +2,16 @@
   <div id="app"  :class="typeof weather.main != 'undefined' && weather.main.temp > 16 ? 'warm' : ''">
     <main class="">
       <div class="search-box w-5/6 m-auto flex">
-        <input type="search" placeholder="Search.."
+        <input type="search" placeholder="Search..."
         class="search-bar mt-10"
         v-model="query"
         @keypress="fetchWeather"/>
+      </div>
+      <div class="flex justify-center">
+        <div v-if="load" class=" mt-56 justify-center lds-ripple"><div></div><div></div></div>
+        <div class="cc justify-center m-auto">
+          <vue-country-code class="" @onSelect="onSelect"></vue-country-code>
+        </div>
       </div>
       <div class="weather-wrap mt-20" v-if="typeof weather.main != 'undefined'">
         <div class="location-box">
@@ -31,6 +37,8 @@ export default {
       api_key: '95388c805d3d33d24bf32f4de85841fe',
       url_base: "https://api.openweathermap.org/data/2.5/",
       query: '',
+      load: false,
+      code: '',
       weather: {}
     }
   },
@@ -49,25 +57,95 @@ export default {
       let year = d.getFullYear();
       return `${day} ${date} ${month} ${year}`;
     },
+    setLoading () {
+      this.load = false;
+    },
+    onSelect({name, iso2, dialCode}) {
+      this.code = name;
+      return {name, iso2, dialCode};
+    },
     fetchWeather(e) {
       if (e.key ===  "Enter") {
+        this.weather = {};
+        this.load = true;
         http.get(this.url_base + 'weather?q=' + this.query + '&units=metric&appid=' + this.api_key)
         .then(response => {
-          return response
+          this.setLoading();
+          return response;
         }).then(this.setResults)
       }
+    },
+    localWeather() {
+      let country = this.findCountry(this.code);
+      country = country.join('');
+      console.log('country =', country);
+      http.get(this.url_base + 'weather?q=' + country + '&units=metric&appid=' + this.api_key)
+          .then(response => {
+            this.setLoading();
+            return response;
+          }).then(this.setResults)
+    },
+    findCountry(country) {
+      let newCountry = [];
+      for (let i = 0; country[i]; i++) {
+        newCountry[i] = country[i];
+        if (country[i + 1] === ' ') { return newCountry; }
+      }
+      return newCountry;
     }
+  },
+  mounted() {
+    setTimeout(func => {
+      this.localWeather()
+    }, 2000);
   }
 }
 </script>
 
 <style lang="scss">
+.cc {
+  display: none;
+}
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
   background-size: cover;
   transition: 0.4s;
+}
+
+.lds-ripple {
+  display: inline-block;
+  position: relative;
+  width: 80px;
+  height: 80px;
+}
+.lds-ripple div {
+  position: absolute;
+  border: 4px solid #000;
+  opacity: 1;
+  border-radius: 50%;
+  animation: lds-ripple 1s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+}
+.lds-ripple div:nth-child(2) {
+  animation-delay: -0.5s;
+}
+
+@keyframes lds-ripple {
+  0% {
+    top: 36px;
+    left: 36px;
+    width: 0;
+    height: 0;
+    opacity: 1;
+  }
+  100% {
+    top: 0px;
+    left: 0px;
+    width: 72px;
+    height: 72px;
+    opacity: 0;
+  }
 }
 
 body {
