@@ -114,7 +114,7 @@ export default {
     this.load = true;
     setTimeout(func => {
       this.localWeather()
-    }, 3000);
+    }, 3800);
   }
 }
 </script>
@@ -167,7 +167,6 @@ export default {
 
 body {
   font-family: 'montserrat', sans-serif;
-  background-color: red;
   background-image: url("./assets/images/cold-bg.jpg");
 }
 
@@ -179,7 +178,6 @@ body {
 main {
   min-height: 100vh;
   background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.7));
-  //background-image: url("./assets/images/cold-bg.jpg");
 }
 
 .search-box {
