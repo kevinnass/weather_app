@@ -14,7 +14,7 @@ npm run serve
 
 # Description
 <h4>
-  A Weather application based on an api service
+  A Weather application based on an api service (openweathermap)
 </h4>
 
-# Url: http://
+# Url: http://meteoapp.surge.sh/
